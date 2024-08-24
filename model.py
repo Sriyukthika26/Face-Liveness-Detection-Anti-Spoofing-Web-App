@@ -2,7 +2,7 @@ import tensorflow as tf
 import tf2onnx
 
 try:   
-    # Load your existing model (replace with your actual model loading code)
+    # Loading existing model
     model = tf.keras.models.load_model('liveness.model') 
     # Save the model in .h5 format
     model.save('liveness_model.h5') 
