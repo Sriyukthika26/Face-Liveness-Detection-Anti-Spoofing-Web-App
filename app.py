@@ -7,7 +7,7 @@ import imutils
 import pickle
 import os
 
-model_path='liveness.model'
+model_path='liveness_model.h5'
 le_path='label_encoder.pickle'
 encodings='encoded_faces.pickle'
 detector_folder='face_detector'
