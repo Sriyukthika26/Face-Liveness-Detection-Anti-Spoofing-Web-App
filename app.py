@@ -6,8 +6,11 @@ import numpy as np
 import imutils
 import pickle
 import os
+import onnxruntime as ort
 
-model_path='liveness_model.h5'
+
+
+model_path='liveness_model.onnx'
 le_path='label_encoder.pickle'
 encodings='encoded_faces.pickle'
 detector_folder='face_detector'
@@ -27,7 +30,8 @@ model_path = os.path.sep.join([args['detector'], 'res10_300x300_ssd_iter_140000.
 detector_net = cv2.dnn.readNetFromCaffe(proto_path, model_path)
 	
 # load the liveness detector model and label encoder from disk
-liveness_model = tf.keras.models.load_model(args['model'])
+print('[INFO] loading liveness model and label encoder...')
+session = ort.InferenceSession(args['model'])
 le = pickle.loads(open(args['le'], 'rb').read())
 
 
@@ -101,7 +105,11 @@ class VideoProcessor:
 				# the first value stores the prob of being real, the second value stores the prob of being fake
 				# so argmax will pick the one with highest prob
 				# we care only first output (since we have only 1 input)
-				preds = liveness_model.predict(face)[0]
+				# Prepare input dictionary for ONNX model
+				input_name = session.get_inputs()[0].name
+				outputs = session.run(None, {input_name: face})
+				#process the outputs
+				preds = outputs[0][0]
 				j = np.argmax(preds)
 				label_name = le.classes_[j] # get label of predicted class
 				
@@ -119,7 +127,7 @@ class VideoProcessor:
 				cv2.rectangle(frm, (startX, startY), (endX, endY), (0, 0, 255), 4)
 
 		return av.VideoFrame.from_ndarray(frm, format='bgr24')
-
+#setup the WebRTC video stream
 webrtc_streamer(key="key", video_processor_factory=VideoProcessor,rtc_configuration={
         "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
     },sendback_audio=False, video_receiver_size=1)
