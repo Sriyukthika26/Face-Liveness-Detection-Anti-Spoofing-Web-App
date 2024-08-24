@@ -7,7 +7,7 @@ import imutils
 import pickle
 import os
 import onnxruntime as ort
-
+import streamlit as st
 
 
 model_path='liveness_model.onnx'
@@ -128,6 +128,8 @@ class VideoProcessor:
 
 		return av.VideoFrame.from_ndarray(frm, format='bgr24')
 #setup the WebRTC video stream
+
+st.title("Face Liveness Detection")
 webrtc_streamer(key="key", video_processor_factory=VideoProcessor,rtc_configuration={
         "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
     },sendback_audio=False, video_receiver_size=1)
