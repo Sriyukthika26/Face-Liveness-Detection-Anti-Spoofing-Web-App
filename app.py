@@ -129,8 +129,15 @@ class VideoProcessor:
 		return av.VideoFrame.from_ndarray(frm, format='bgr24')
 #setup the WebRTC video stream
 
-st.title("Face Liveness Detection")
+
+path = 'streamlit_test.html'
+
+down = 'down.html'
+
+st.markdown(open(path).read(),unsafe_allow_html=True)
+
 webrtc_streamer(key="key", video_processor_factory=VideoProcessor,rtc_configuration={
         "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
     },sendback_audio=False, video_receiver_size=1)
 
+st.markdown(open(down).read(),unsafe_allow_html=True)
